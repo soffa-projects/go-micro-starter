@@ -1,0 +1,215 @@
+basePath: /v1
+definitions:
+  core.AuthInput:
+    properties:
+      code:
+        type: string
+      device:
+        $ref: '#/definitions/core.DeviceInfo'
+    required:
+    - code
+    - device
+    type: object
+  core.AuthOutput:
+    properties:
+      fb_token:
+        type: string
+      profile:
+        $ref: '#/definitions/core.User'
+      public_key:
+        type: string
+      token:
+        type: string
+    type: object
+  core.AuthorizeInput:
+    properties:
+      channel:
+        description: Device      DeviceInfo `json:"device" validate:"required"`
+        type: string
+      device_id:
+        type: string
+      phone_number:
+        type: string
+    required:
+    - device_id
+    - phone_number
+    type: object
+  core.AuthorizeOutput:
+    properties:
+      channel:
+        type: string
+      status:
+        type: string
+      token:
+        type: string
+    type: object
+  core.DeviceInfo:
+    properties:
+      model:
+        description: Id       string `json:"id" validate:"required"`
+        type: string
+      platform:
+        type: string
+      release:
+        type: string
+    required:
+    - model
+    - platform
+    - release
+    type: object
+  core.ModerationResult:
+    properties:
+      details:
+        type: string
+      flagged:
+        type: boolean
+    type: object
+  core.SyncMeUpInput:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      notification_settings:
+        type: string
+      picture:
+        type: string
+    required:
+    - id
+    - name
+    type: object
+  core.User:
+    properties:
+      created_at:
+        type: string
+      device_id:
+        type: string
+      device_platform:
+        type: string
+      id:
+        type: string
+      last_login_at:
+        type: string
+      last_seen_at:
+        type: string
+      name:
+        description: Secret         *string    `json:"-"`
+        type: string
+      phone_number:
+        description: Username       *string    `json:"username,omitempty"`
+        type: string
+      picture:
+        type: string
+    type: object
+info:
+  contact:
+    email: support@louma.app
+    name: API Support
+    url: http://louma.app/support
+  description: Documentation for our API
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://loupa.amm/api/terms/
+  title: Service API
+  version: "1.0"
+paths:
+  /auth/authorize:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: application version
+        in: header
+        name: X-Value
+        required: true
+        type: string
+      - description: Authentication input
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/core.AuthorizeInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/core.AuthorizeOutput'
+      summary: Verify user phone number
+      tags:
+      - users
+  /auth/device:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Authentication information
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/core.AuthInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/core.AuthOutput'
+      security:
+      - BearerAuth: []
+      summary: Authenticate user
+      tags:
+      - users
+  /listings/{id}/moderation:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: listing's id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/core.ModerationResult'
+      summary: Check listing moderation
+      tags:
+      - listings
+  /users/me/sync:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Request input
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/core.SyncMeUpInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/core.User'
+      security:
+      - BearerAuth: []
+      summary: Verify user phone number
+      tags:
+      - users
+securityDefinitions:
+  BearerAuth:
+    description: '"Type ''Bearer TOKEN'' to correctly set the API Key"'
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

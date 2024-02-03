@@ -1,0 +1,329 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Documentation for our API",
+        "title": "Service API",
+        "termsOfService": "http://loupa.amm/api/terms/",
+        "contact": {
+            "name": "API Support",
+            "url": "http://louma.app/support",
+            "email": "support@louma.app"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0"
+    },
+    "basePath": "/v1",
+    "paths": {
+        "/auth/authorize": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Verify user phone number",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "application version",
+                        "name": "X-Value",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Authentication input",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/core.AuthorizeInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/core.AuthorizeOutput"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/device": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Authenticate user",
+                "parameters": [
+                    {
+                        "description": "Authentication information",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/core.AuthInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/core.AuthOutput"
+                        }
+                    }
+                }
+            }
+        },
+        "/listings/{id}/moderation": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "listings"
+                ],
+                "summary": "Check listing moderation",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "listing's id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/core.ModerationResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/me/sync": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Verify user phone number",
+                "parameters": [
+                    {
+                        "description": "Request input",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/core.SyncMeUpInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/core.User"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "core.AuthInput": {
+            "type": "object",
+            "required": [
+                "code",
+                "device"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "device": {
+                    "$ref": "#/definitions/core.DeviceInfo"
+                }
+            }
+        },
+        "core.AuthOutput": {
+            "type": "object",
+            "properties": {
+                "fb_token": {
+                    "type": "string"
+                },
+                "profile": {
+                    "$ref": "#/definitions/core.User"
+                },
+                "public_key": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "core.AuthorizeInput": {
+            "type": "object",
+            "required": [
+                "device_id",
+                "phone_number"
+            ],
+            "properties": {
+                "channel": {
+                    "description": "Device      DeviceInfo `json:\"device\" validate:\"required\"`",
+                    "type": "string"
+                },
+                "device_id": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
+                }
+            }
+        },
+        "core.AuthorizeOutput": {
+            "type": "object",
+            "properties": {
+                "channel": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "core.DeviceInfo": {
+            "type": "object",
+            "required": [
+                "model",
+                "platform",
+                "release"
+            ],
+            "properties": {
+                "model": {
+                    "description": "Id       string `json:\"id\" validate:\"required\"`",
+                    "type": "string"
+                },
+                "platform": {
+                    "type": "string"
+                },
+                "release": {
+                    "type": "string"
+                }
+            }
+        },
+        "core.ModerationResult": {
+            "type": "object",
+            "properties": {
+                "details": {
+                    "type": "string"
+                },
+                "flagged": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "core.SyncMeUpInput": {
+            "type": "object",
+            "required": [
+                "id",
+                "name"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "notification_settings": {
+                    "type": "string"
+                },
+                "picture": {
+                    "type": "string"
+                }
+            }
+        },
+        "core.User": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "device_id": {
+                    "type": "string"
+                },
+                "device_platform": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "last_login_at": {
+                    "type": "string"
+                },
+                "last_seen_at": {
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Secret         *string    `json:\"-\"`",
+                    "type": "string"
+                },
+                "phone_number": {
+                    "description": "Username       *string    `json:\"username,omitempty\"`",
+                    "type": "string"
+                },
+                "picture": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "description": "\"Type 'Bearer TOKEN' to correctly set the API Key\"",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}

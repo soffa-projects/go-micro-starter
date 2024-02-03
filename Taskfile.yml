@@ -1,0 +1,33 @@
+version: "3"
+
+tasks:
+  dev:
+    cmds:
+      - air
+  test:
+    cmds:
+      - GO_ENV=test go test -v ./internal/features/...
+  apidocs:
+    cmds:
+      - swag init --dir ./cmd/server,./internal/features --parseInternal --parseDependency -o apidocs
+  build:
+    cmds:
+      - go build -o bin/app cmd/server/main.go
+  start:
+    cmds:
+      - ./app
+  clean: # task tidy
+    cmds:
+      - go clean -modcache
+  tidy: # task tidy
+    cmds:
+      - go mod tidy -compat=1.21
+  install:
+    cmds:
+      - go install github.com/swaggo/swag/cmd/swag@latest # (swagger)
+      - go install github.com/go-task/task/v3/cmd/task@latest
+      - go get -u github.com/cosmtrek/air # https://github.com/cosmtrek/air (live reload)
+  upgrade:
+    cmds:
+      - go get -u ./...
+      - go mod tidy
